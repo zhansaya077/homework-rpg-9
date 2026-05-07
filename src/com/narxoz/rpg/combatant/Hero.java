@@ -154,19 +154,30 @@ public class Hero {
      *
      * @return a HeroMemento snapshot, or null in the scaffold
      */
-    public HeroMemento createMemento() {
-        // TODO: capture the full mutable state into a HeroMemento.
-        return null;
-    }
+   public HeroMemento createMemento() {
+
+    return new HeroMemento(
+            hp,
+            mana,
+            gold
+    );
+}
 
     /**
      * Restores this hero from a previously captured memento.
      *
      * @param memento the snapshot to restore from
      */
-    public void restoreFromMemento(HeroMemento memento) {
-        // TODO: read the snapshot and restore the hero's mutable state.
+   public void restoreFromMemento(HeroMemento memento) {
+
+    if (memento == null) {
+        return;
     }
+
+    this.hp = memento.getHp();
+    this.mana = memento.getMana();
+    this.gold = memento.getGold();
+}
 
     @Override
     public String toString() {

@@ -1,38 +1,89 @@
+
 package com.narxoz.rpg.vault;
 
-/**
- * Summary of a Chronomancer's Vault run.
- */
-public class VaultRunResult {
+import com.narxoz.rpg.artifact.AppraisalVisitor;
+import com.narxoz.rpg.combatant.Hero;
+import com.narxoz.rpg.combatant.HeroMemento;
+import com.narxoz.rpg.memento.Caretaker;
 
-    private final int artifactsAppraised;
-    private final int mementosCreated;
-    private final int restoredCount;
+import java.util.List;
 
-    public VaultRunResult(int artifactsAppraised, int mementosCreated, int restoredCount) {
-        this.artifactsAppraised = artifactsAppraised;
-        this.mementosCreated = mementosCreated;
-        this.restoredCount = restoredCount;
-    }
+public class ChronomancerEngine {
 
-    public int getArtifactsAppraised() {
-        return artifactsAppraised;
-    }
 
-    public int getMementosCreated() {
-        return mementosCreated;
-    }
+    public VaultRunResult runVault(List<Hero> party) {
 
-    public int getRestoredCount() {
-        return restoredCount;
-    }
+        Caretaker caretaker = new Caretaker();
 
-    @Override
-    public String toString() {
-        return "VaultRunResult{"
-                + "artifactsAppraised=" + artifactsAppraised
-                + ", mementosCreated=" + mementosCreated
-                + ", restoredCount=" + restoredCount
-                + '}';
+        AppraisalVisitor visitor =
+                new AppraisalVisitor();
+
+        int artifactsAppraised = 0;
+        int mementosCreated = 0;
+        int restoredCount = 0;
+
+        System.out.println("=== Chronomancer's Vault ===");
+
+        for (Hero hero : party) {
+
+            System.out.println("\nHero enters vault:");
+            System.out.println(hero);
+
+            
+            HeroMemento save =
+                    hero.createMemento();
+
+            caretaker.save(save);
+
+            mementosCreated++;
+
+            System.out.println("Hero state saved.");
+
+            
+            System.out.println("Appraising artifacts...");
+
+            hero.getInventory().accept(visitor);
+
+            artifactsAppraised +=
+                    hero.getInventory()
+                            .getArtifacts()
+                            .size();
+
+           
+            System.out.println("Trap activated!");
+
+            hero.takeDamage(150);
+
+            System.out.println(
+                    "Hero HP after trap: "
+                            + hero.getHp()
+            );
+
+           
+            if (!hero.isAlive()) {
+
+                System.out.println(
+                        "Rewinding time..."
+                );
+
+                hero.restoreFromMemento(
+                        caretaker.undo()
+                );
+
+                restoredCount++;
+            }
+
+            System.out.println(
+                    "Final hero state:"
+            );
+
+            System.out.println(hero);
+        }
+
+        return new VaultRunResult(
+                artifactsAppraised,
+                mementosCreated,
+                restoredCount
+        );
     }
 }
